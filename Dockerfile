@@ -9,11 +9,11 @@ COPY package*.json ./
 # Step 1: Install all deps WITHOUT scripts (prevents libsignal native build failure)
 RUN npm install --legacy-peer-deps --ignore-scripts
 
-# Step 2: Compile better-sqlite3 native binary directly with node-gyp
-# (--build-from-source flag is not recognized by better-sqlite3's build system)
-RUN cd /app/node_modules/better-sqlite3 && node-gyp rebuild && \
+# Step 2: Install node-gyp globally then rebuild better-sqlite3 native binary
+RUN npm install -g node-gyp
+RUN npm rebuild better-sqlite3 && \
     echo "=== better-sqlite3 binary OK ===" && \
-    ls -la build/Release/better_sqlite3.node
+    ls -la /app/node_modules/better-sqlite3/build/Release/better_sqlite3.node
 
 # Step 3: Install optional modules that ws and node-fetch try to load
 RUN npm install bufferutil encoding --legacy-peer-deps --ignore-scripts || true
